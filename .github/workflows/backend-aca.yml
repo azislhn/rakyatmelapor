@@ -65,5 +65,5 @@ jobs:
           #   DB_NAME=
           targetPort: 80
           ingress: external # Akses dari luar (untuk diakses oleh frontend)
-          minReplicas: 1
-          maxReplicas: 1
+          # minReplicas: 1
+          # maxReplicas: 1

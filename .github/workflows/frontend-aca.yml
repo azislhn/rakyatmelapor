@@ -59,6 +59,6 @@ jobs:
           imageToDeploy: ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           targetPort: 80 # Port yang diekspos oleh Nginx di container
           ingress: external # Akses dari luar (ini adalah aplikasi web)
-          minReplicas: 1
-          maxReplicas: 1
+          # minReplicas: 1
+          # maxReplicas: 1
 
