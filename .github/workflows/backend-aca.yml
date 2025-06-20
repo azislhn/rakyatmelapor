@@ -1,0 +1,69 @@
+name: Deploy Backend to Azure Container Apps
+
+on:
+  push:
+    branches:
+      - master # Ganti dengan branch utama Anda
+    paths:
+      - 'backend/**' # Trigger jika ada perubahan di folder backend
+
+env:
+  AZURE_RESOURCE_GROUP: RakyatMelaporGroup
+  AZURE_CONTAINER_APPS_ENVIRONMENT: rakyatmelapor-env
+  AZURE_LOCATION: eastus # Lokasi Azure Anda
+  CONTAINER_APP_NAME: rakyat-melapor-backend-app # Nama Container App backend
+  ACR_NAME: ${{ secrets.ACR_NAME }} # Nama ACR dari GitHub Secret
+  ACR_LOGIN_SERVER: ${{ secrets.ACR_NAME }}.azurecr.io # Contoh: youracrname.azurecr.io
+  IMAGE_NAME: rakyat-melapor-backend
+  PHP_DOCKERFILE_PATH: ./backend/Dockerfile
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Azure Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build and push Docker image for backend
+        id: build-image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend # Konteks build adalah folder backend
+          file: ${{ env.PHP_DOCKERFILE_PATH }}
+          push: true
+          tags: ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }} # Tag image dengan SHA commit
+
+      - name: Deploy to Azure Container Apps
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }}/backend # Path ke kode sumber aplikasi Anda
+          containerAppEnvironment: ${{ env.AZURE_CONTAINER_APPS_ENVIRONMENT }}
+          resourceGroup: ${{ env.AZURE_RESOURCE_GROUP }}
+          containerAppName: ${{ env.CONTAINER_APP_NAME }}
+          imageToDeploy: ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          # Variabel lingkungan untuk koneksi database
+          environmentVariables: |
+            DB_HOST=${{ secrets.MYSQL_SERVER_NAME }}
+            DB_USER=${{ secrets.MYSQL_ADMIN_USER }}
+            DB_PASSWORD=${{ secrets.MYSQL_ADMIN_PASSWORD }}
+                DB_NAME=${{ secrets.MYSQL_DB_NAME }}
+              targetPort: 80 # Port yang diekspos oleh Apache di container PHP Anda
+              ingress: external # Akses dari luar (untuk diakses oleh frontend)
+              minReplicas: 1
+              maxReplicas: 1 # Untuk aplikasi sederhana, satu replika cukup
