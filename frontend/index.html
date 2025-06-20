@@ -4,13 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplikasi Pelaporan Warga</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Menggunakan font Inter secara default */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f2f5; /* Warna latar belakang lembut */
+            background-color: #f0f2f5;
         }
     </style>
 </head>
@@ -51,6 +49,10 @@
     </div>
 
     <script>
+        // NOTE: Anda perlu mengubah 'action' di form di atas secara manual
+        // atau melalui konfigurasi CI/CD setelah deployment backend ke Azure.
+        // Contoh: action="https://<URL_BACKEND_CONTAINER_APP_ANDA>/server.php"
+
         document.getElementById('reportForm').addEventListener('submit', async function(event) {
             event.preventDefault(); // Mencegah pengiriman formulir default
 
@@ -59,20 +61,24 @@
             const responseMessage = document.getElementById('responseMessage');
 
             try {
-                // Menggunakan fetch API untuk mengirim data ke backend PHP
                 const response = await fetch(form.action, {
                     method: 'POST',
-                    body: formData, // FormData otomatis mengatur Content-Type sebagai multipart/form-data
+                    body: formData,
                 });
 
-                const result = await response.json(); // Mengasumsikan backend merespons JSON
+                const result = await response.json();
 
-                if (response.ok) { // Jika respons berhasil (status 200 OK)
-                    responseMessage.textContent = result.message;
-                    responseMessage.className = 'mt-6 p-4 rounded-lg text-center bg-green-100 text-green-700 block';
-                    form.reset(); // Mengatur ulang formulir setelah berhasil
+                // Perbarui logika untuk menangani status 'warning' dari backend
+                if (response.ok) {
+                    if (result.status === 'warning') {
+                        responseMessage.textContent = result.message;
+                        responseMessage.className = 'mt-6 p-4 rounded-lg text-center bg-yellow-100 text-yellow-700 block';
+                    } else {
+                        responseMessage.textContent = result.message;
+                        responseMessage.className = 'mt-6 p-4 rounded-lg text-center bg-green-100 text-green-700 block';
+                        form.reset(); // Mengatur ulang formulir hanya jika berhasil disimpan
+                    }
                 } else {
-                    // Tangani kesalahan dari backend
                     responseMessage.textContent = result.error || 'Terjadi kesalahan saat mengirim laporan.';
                     responseMessage.className = 'mt-6 p-4 rounded-lg text-center bg-red-100 text-red-700 block';
                 }

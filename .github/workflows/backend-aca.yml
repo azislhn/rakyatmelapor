@@ -3,7 +3,7 @@ name: Deploy Backend to Azure Container Apps
 on:
   push:
     branches:
-      - master # Ganti dengan branch utama Anda
+      - main # Ganti dengan branch utama Anda
     paths:
       - 'backend/**' # Trigger jika ada perubahan di folder backend
 
@@ -44,26 +44,26 @@ jobs:
         id: build-image
         uses: docker/build-push-action@v5
         with:
-          context: ./backend # Konteks build adalah folder backend
+          context: ./backend
           file: ${{ env.PHP_DOCKERFILE_PATH }}
           push: true
-          tags: ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }} # Tag image dengan SHA commit
+          tags: ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
       - name: Deploy to Azure Container Apps
         uses: azure/container-apps-deploy-action@v2
         with:
-          appSourcePath: ${{ github.workspace }}/backend # Path ke kode sumber aplikasi Anda
+          appSourcePath: ${{ github.workspace }}/backend
           containerAppEnvironment: ${{ env.AZURE_CONTAINER_APPS_ENVIRONMENT }}
           resourceGroup: ${{ env.AZURE_RESOURCE_GROUP }}
           containerAppName: ${{ env.CONTAINER_APP_NAME }}
           imageToDeploy: ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          # Variabel lingkungan untuk koneksi database
-          environmentVariables: |
-            DB_HOST=${{ secrets.MYSQL_SERVER_NAME }}
-            DB_USER=${{ secrets.MYSQL_ADMIN_USER }}
-            DB_PASSWORD=${{ secrets.MYSQL_ADMIN_PASSWORD }}
-                DB_NAME=${{ secrets.MYSQL_DB_NAME }}
-              targetPort: 80 # Port yang diekspos oleh Apache di container PHP Anda
-              ingress: external # Akses dari luar (untuk diakses oleh frontend)
-              minReplicas: 1
-              maxReplicas: 1 # Untuk aplikasi sederhana, satu replika cukup
+          # Hapus atau kosongkan bagian environmentVariables ini karena tidak ada DB Azure untuk saat ini
+          # environmentVariables: |
+          #   DB_HOST=
+          #   DB_USER=
+          #   DB_PASSWORD=
+          #   DB_NAME=
+          targetPort: 80
+          ingress: external # Akses dari luar (untuk diakses oleh frontend)
+          minReplicas: 1
+          maxReplicas: 1
