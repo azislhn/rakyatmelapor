@@ -3,7 +3,7 @@ name: Deploy Frontend to Azure Container Apps
 on:
   push:
     branches:
-      - main # Ganti dengan branch utama Anda
+      - master # Ganti dengan branch utama Anda
     paths:
       - 'frontend/**' # Trigger jika ada perubahan di folder frontend
 

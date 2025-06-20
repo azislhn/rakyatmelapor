@@ -3,7 +3,7 @@ name: Deploy Backend to Azure Container Apps
 on:
   push:
     branches:
-      - main # Ganti dengan branch utama Anda
+      - master # Ganti dengan branch utama Anda
     paths:
       - 'backend/**' # Trigger jika ada perubahan di folder backend
 
