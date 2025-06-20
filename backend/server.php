@@ -18,7 +18,7 @@ $username = getenv('DB_USER') ?? 'root';
 $password = getenv('DB_PASSWORD') ?? 'admin123';
 $dbname = getenv('DB_NAME') ?? 'rakyat_melapor';
 
-$conn = null; // Inisialisasi koneksi sebagai null
+$conn = null; 
 
 // Coba buat koneksi database hanya jika semua info tersedia
 if ($servername && $username && $password && $dbname) {
