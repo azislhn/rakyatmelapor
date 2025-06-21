@@ -67,3 +67,6 @@ jobs:
           ingress: external # Akses dari luar (untuk diakses oleh frontend)
           # minReplicas: 1
           # maxReplicas: 1
+          registryUrl: ${{ env.ACR_LOGIN_SERVER }}
+          registryUsername: ${{ secrets.ACR_USERNAME }}
+          registryPassword: ${{ secrets.ACR_PASSWORD }}

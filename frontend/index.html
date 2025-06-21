@@ -3,18 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Pelaporan Warga</title>
+    <title>Rakyat Melapor</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Menggunakan font Inter secara default */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f2f5;
+            background-color: #f0f2f5; /* Warna latar belakang lembut */
         }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
     <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md mx-auto">
-        <h2 class="text-3xl font-extrabold text-gray-900 text-center mb-6">Laporkan Masalah Anda</h2>
+        <h2 class="text-3xl font-extrabold text-gray-900 text-center mb-6">Sampaikan Laporan Anda</h2>
+        <!-- ACTION INI AKAN DIUBAH SETELAH DEPLOY KE AZURE -->
+        <!-- Untuk pengembangan lokal: action="http://localhost:8080/server.php" -->
+        <!-- Setelah deploy ke Azure: action="https://<URL_BACKEND_CONTAINER_APP_ANDA>/server.php" -->
         <form id="reportForm" action="http://localhost:8080/server.php" method="POST" class="space-y-5">
             <div>
                 <label for="identity" class="block text-sm font-medium text-gray-700 mb-1">NIK/Email/Nama Lengkap</label>
@@ -49,12 +54,8 @@
     </div>
 
     <script>
-        // NOTE: Anda perlu mengubah 'action' di form di atas secara manual
-        // atau melalui konfigurasi CI/CD setelah deployment backend ke Azure.
-        // Contoh: action="https://<URL_BACKEND_CONTAINER_APP_ANDA>/server.php"
-
         document.getElementById('reportForm').addEventListener('submit', async function(event) {
-            event.preventDefault(); // Mencegah pengiriman formulir default
+            event.preventDefault(); 
 
             const form = event.target;
             const formData = new FormData(form);
@@ -68,7 +69,6 @@
 
                 const result = await response.json();
 
-                // Perbarui logika untuk menangani status 'warning' dari backend
                 if (response.ok) {
                     if (result.status === 'warning') {
                         responseMessage.textContent = result.message;

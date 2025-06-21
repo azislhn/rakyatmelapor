@@ -1,5 +1,5 @@
 -- Pastikan database yang benar sedang digunakan
-USE rakyat_melapor;
+USE rakyat_melapor_db;
 
 -- Buat tabel 'reports' jika belum ada
 CREATE TABLE IF NOT EXISTS reports (

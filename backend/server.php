@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: application/json');
 // Mengizinkan permintaan dari domain manapun untuk pengembangan
-// Dalam produksi, batasi ke domain frontend Anda
+// Dalam produksi, ubah '*' menjadi URL frontend Azure Container App Anda
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
@@ -12,11 +12,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-// Konfigurasi Database
-$servername = getenv('DB_HOST') ?? 'db';
-$username = getenv('DB_USER') ?? 'root';
-$password = getenv('DB_PASSWORD') ?? 'admin123';
-$dbname = getenv('DB_NAME') ?? 'rakyat_melapor';
+// Konfigurasi Database - Ambil dari variabel lingkungan
+// Jika tidak ada koneksi database, aplikasi akan mencatat error tetapi tetap berjalan
+$servername = getenv('DB_HOST') ? getenv('DB_HOST') : 'db';
+$username = getenv('DB_USER') ? getenv('DB_USER') : 'root';
+$password = getenv('DB_PASSWORD') ? getenv('DB_PASSWORD') : 'admin123';
+$dbname = getenv('DB_NAME') ? getenv('DB_NAME') : 'rakyat_melapor_db';
 
 $conn = null; // Inisialisasi koneksi sebagai null
 
@@ -43,8 +44,6 @@ if ($servername && $username && $password && $dbname) {
         if (!$conn->query($create_table_sql)) {
             error_log("Failed to create table: " . $conn->error);
             // Tabel gagal dibuat, mungkin ada masalah lain.
-            // Biarkan koneksi tetap ada atau set null jika ingin non-fungsional.
-            // Untuk skenario ini, kita anggap koneksi berhasil tapi ada error tabel.
         }
     }
 } else {
@@ -87,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 } else {
     // Jika bukan permintaan POST, kirim pesan error atau status
-    echo json_encode(['message' => 'Welcome to the reporting backend!', 'database_status' => $conn ? 'connected' : 'not_connected_or_configured']);
+    echo json_encode(['message' => 'Selamat datang di backend pelaporan!', 'database_status' => $conn ? 'terhubung' : 'tidak_terhubung_atau_terkonfigurasi']);
 }
 
 // Menutup koneksi database jika ada

@@ -2,40 +2,40 @@ services:
   # Layanan Frontend (Nginx)
   frontend:
     build:
-      context: ./frontend # Lokasi Dockerfile frontend
+      context: ./frontend
     ports:
-      - "80:80" # Map port 80 dari host ke port 80 di container
+      - "80:80"
     volumes:
-      - ./frontend:/usr/share/nginx/html # Mengikat volume untuk pengembangan langsung
+      - ./frontend:/usr/share/nginx/html
 
   # Layanan Backend (PHP dengan Apache)
   backend:
     build:
-      context: ./backend # Lokasi Dockerfile backend
+      context: ./backend
     ports:
-      - "8080:80" # Map port 8080 dari host ke port 80 di container
+      - "8080:80"
     volumes:
-      - ./backend:/var/www/html # Mengikat volume untuk pengembangan langsung
+      - ./backend:/var/www/html
     depends_on:
-      - db # Backend bergantung pada layanan database
+      - db
 
   # Layanan Database (MySQL)
   db:
-    image: mysql:8.0 # Menggunakan image MySQL versi 8.0
+    image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: admin123 # Password root database
-      MYSQL_DATABASE: rakyat_melapor # Nama database yang akan dibuat
+      MYSQL_ROOT_PASSWORD: admin123
+      MYSQL_DATABASE: rakyat_melapor_db # Nama database baru
     volumes:
-      - db_data:/var/lib/mysql # Mengikat volume untuk menyimpan data database secara persisten
-      - ./backend:/docker-entrypoint-initdb.d # MySQL akan menjalankan semua .sql di sini saat inisialisasi awal
+      - db_data:/var/lib/mysql
+      - ./backend:/docker-entrypoint-initdb.d # init.sql akan dibaca dari sini
 
   # Layanan phpMyAdmin
   phpmyadmin:
-    image: phpmyadmin:5.2.2-apache # Menggunakan image phpMyAdmin terbaru
+    image: phpmyadmin:5.2.2-apache # Versi spesifik
     ports:
-      - "8081:80" # Map port 8081 dari host ke port 80 di container phpMyAdmin
+      - "8081:80"
     depends_on:
-      - db # phpMyAdmin bergantung pada layanan database
+      - db
 
 volumes:
   db_data: # Definisi volume untuk data database
